@@ -29,6 +29,7 @@
     "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\""
   },
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "@vernier/godirect": "1.5.0",
     "arraybuffer-loader": "^1.0.6",
     "atob": "2.1.2",
@@ -42,18 +43,22 @@
     "jszip": "^3.1.5",
     "minilog": "3.1.0",
     "nets": "3.2.0",
+    "regenerator-runtime": "^0.13.7",
     "scratch-parser": "5.0.0",
     "scratch-sb1-converter": "0.2.7",
     "scratch-translate-extension-languages": "0.0.20191118205314",
+    "socket.io-client": "2.3.1",
     "text-encoding": "0.7.0",
     "worker-loader": "^1.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.1.0",
     "adm-zip": "0.4.11",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
+    "babel-preset-env": "^1.7.0",
     "callsite": "^1.0.0",
     "copy-webpack-plugin": "^4.5.4",
     "docdash": "^1.0.0",
