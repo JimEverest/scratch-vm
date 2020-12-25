@@ -45,6 +45,9 @@ class DobotClient{
             null, // onDisconnect,
             null, // onMessage,
             this.onAdapterPluginMessage.bind(this), // onAdapterPluginMessage,
+
+            null,
+            null,
             //this.update_nodes_status.bind(this), // update_nodes_status,
             //this.node_statu_change_callback.bind(this), // node_statu_change_callback,
             null, // notify_callback,
@@ -85,6 +88,7 @@ class DobotExtension{
          * The runtime instantiating this block package.
          * @type {Runtime}
          */
+        this.runtime = runtime;
         this.dobot_client = new DobotClient(NODE_ID, HELP_URL, runtime);
     }
 
@@ -109,6 +113,7 @@ class DobotExtension{
                             defaultValue: "COM1",
                         },
                     },
+                    text: 'Connect Arm [port]'
                 }
             ],
             menus: {
@@ -123,8 +128,8 @@ class DobotExtension{
 
     // broadcast connect message
     connect_arm(args) {
-        const content = args.content;
-        return this.dobot_client.connect_dobot(NODE_ID,port); //await.
+        const _port = args.port;
+        return this.dobot_client.connect_dobot(NODE_ID,_port); //await.
     }
 
 }
