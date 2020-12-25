@@ -4,7 +4,7 @@ const formatMessage = require("format-message");
 // const io = require("socket.io-client"); // yarn add socket.io-client socket.io-client@2.2.0
 const AdapterBaseClient = require("./codelab_adapter_base.js");
 
-// 翻译
+//#region 翻译
 const FormHelp = {
     en: "help",
     "zh-cn": "帮助",
@@ -116,7 +116,10 @@ const FormSetEmitTimeout = {
     en: "set wait timeout [emit_timeout]s",
     "zh-cn": "设置等待超时时间[emit_timeout]秒",
 };
+//#endregion
 
+
+//#region const
 /**
  * Icon svg to be displayed at the left edge of each extension block, encoded as a data URI.
  * @type {string}
@@ -128,9 +131,12 @@ const menuIconURI = blockIconURI;
 
 const NODE_ID = "eim";
 const HELP_URL = "https://adapter.codelab.club/extension_guide/eim/";
+//#endregion
 
+
+//#region EIM Client
 // EIM: Everything Is Message
-// EIM 与 webui client 的区别: EIM 不关心关于环境的信息
+// EIM 与 webui client 的区别: EIM ls
 
 class EIMClient {
     update_nodes_status(nodes_status) {
@@ -187,7 +193,7 @@ class EIMClient {
     emit_with_messageid(NODE_ID, content){
         return this.adapter_base_client.emit_with_messageid(NODE_ID, content, this.emit_timeout)
     }
-
+    // for WhenMsgRec / When AnyMsgRec Blocks.
     isTargetMessage(content) {
         // 是逻辑判断
         if (
@@ -201,7 +207,7 @@ class EIMClient {
             return true;
         }
     }
-
+    // for WhenTopicMsgRec / WhenAnyTopicMsgRec Blocks.
     isTargetTopicMessage(targerNodeId, targetContent) {
         if (
             (targetContent === this.adapter_node_content_hat || targetContent === "_any") &&
@@ -214,7 +220,7 @@ class EIMClient {
             return true;
         }
     }
-
+    // for Menu items <exts_name>
     formatExtension() {
         // text value list
         console.debug("formatExtension exts_statu -> ", this.exts_statu)
@@ -233,7 +239,7 @@ class EIMClient {
             },
         ];
     }
-
+    //For Menu items <nodes_name>
     formatNode() {
         // text value list
         if (this.nodes_statu && Object.keys(this.nodes_statu).length) {
@@ -251,8 +257,11 @@ class EIMClient {
         ];
     }
 }
+//#endregion
 
 
+
+//#region EMI Block
 class EIMBlocks {
     constructor(runtime) {
         /**
@@ -722,5 +731,5 @@ class EIMBlocks {
 /*
 注意安全问题: 赋予用户强大的能力，但提醒他们担心锤子砸伤脚
 */
-
+//#endregion
 module.exports = EIMBlocks;

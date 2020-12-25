@@ -46,9 +46,10 @@ class AdapterBaseClient {
         const url = new URL(window.location.href);
         let adapterHost = url.searchParams.get("adapter_host"); // 支持树莓派(分布式使用)
         if (!adapterHost) {
-            adapterHost = window.__static
-                ? "127.0.0.1"
-                : "codelab-adapter.codelab.club";
+            adapterHost = "127.0.0.1";
+            // adapterHost = window.__static
+            //     ? "127.0.0.1"
+            //     : "codelab-adapter.codelab.club";
         }
         this.adapterHost = adapterHost;
         const urlParams = new URLSearchParams(window.location.search);
@@ -65,6 +66,7 @@ class AdapterBaseClient {
         this.socket.on("connect", () => {
             // 主动发起获取插件状态的请求，发出一则消息
             // console.log("socket connect ->", reason);
+            alert("EIM CONNECTED!")
             this.nodes_status_trigger();
             // let onConnect = '';
             if (typeof onConnect === "function") {
