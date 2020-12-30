@@ -361,6 +361,8 @@ class AdapterBaseClient {
         if (this.debug_mode){
             payload.timestamp = new Date().getTime();
         }
+
+        console.log(messageID +" ----> "+ payload)
         this.socket.emit("actuator", {
             payload: payload,
             topic: this.SCRATCH_TOPIC,

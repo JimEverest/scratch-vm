@@ -79,6 +79,37 @@ class DobotClient{
         return this.emit_with_messageid(NODE_ID,content)
     }
 
+    is_running(NODE_ID){
+        const content = {};
+        content.command = "_running";
+        return this.emit_with_messageid(NODE_ID,content)
+    }
+
+    is_connecting(NODE_ID){
+        const content = {};
+        content.command = "_connecting";
+        return this.emit_with_messageid(NODE_ID,content)
+    }
+    getPose(keyWord){
+        const content = {};
+        content.command = "getPose";
+        content.keyWord = keyWord;
+        return this.emit_with_messageid(NODE_ID,content)
+    }
+    getPossiblePorts(){
+
+        const content = {}
+        content.command = "getPossiblePort";
+        return this.emit_with_messageid(NODE_ID,content)
+        
+    }
+    auto_connect(){
+        const content = {}
+        content.command = "auto_connect";
+        return this.emit_with_messageid(NODE_ID,content)
+        
+    }
+
 }
 
 
@@ -114,13 +145,80 @@ class DobotExtension{
                         },
                     },
                     text: 'Connect Arm [port]'
+                },
+                {
+                    opcode: "move_arm",
+                    blockType: BlockType.COMMAND,
+                    text: "Move Arm",
+                    arguments: {
+                        x: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "X",
+                        },
+                        y: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "Y",
+                        },
+                        z: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "Z",
+                        }
+                    },
+                    text: 'Move Arm [x] [y] [z]'
+                },
+                {
+                    opcode: "is_adapter_running",     // Todo
+                    blockType: BlockType.BOOLEAN,
+                    text: "is dobot ext running?",
+                    arguments: {
+                    },
+                },
+                {
+                    opcode: "is_dobot_connecting",    // Todo
+                    blockType: BlockType.BOOLEAN,
+                    text: "is dobot connecting?",
+                    arguments: {
+                    },
+                },
+                {
+                    opcode: "getPose",                // Todo
+                    blockType: BlockType.REPORTER, 
+                    arguments: {
+                        pose: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "x",
+                            menu: "pose",
+                        }
+                    },
+                    text: "Get Pose [pose]"
+                },
+                {
+                    opcode: "getPossiblePorts",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.REPORTER, 
+                    arguments: {
+                    },
+                    text: "Get Possible Ports"
+                },
+
+                {
+                    opcode: "auto_connect",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: "Try to auto connnect Dobot"
                 }
+
+
             ],
             menus: {
                 turn: {
                     acceptReporters: true,
-                    items: ["start", "stop"],
+                    items: ["connect", "disconnect"],
                 },
+                pose: {
+                    acceptReporters: true,
+                    items: ["x","y","z","r"],
+                }
             },
         };
     }
@@ -132,6 +230,42 @@ class DobotExtension{
         return this.dobot_client.connect_dobot(NODE_ID,_port); //await.
     }
 
+    move_arm(args) {
+        const x = args.x;
+        const y = args.y;
+        const z = args.z;
+        return this.dobot_client.move_dobot(NODE_ID,x,y,z); //await.
+    }
+
+    is_adapter_running(){
+        return this.dobot_client.is_running(NODE_ID); 
+    }
+
+    is_dobot_connecting(){
+
+    }
+    getPose(args){
+        const keyWord = args.pose;
+        return this.dobot_client.getPose(keyWord); 
+    }
+    getPossiblePorts(args){
+        return this.dobot_client.getPossiblePorts();   
+    }
+    auto_connect(args){
+        return  this.dobot_client.auto_connect();
+    }
 }
 
 module.exports = DobotExtension;
+
+
+
+// todo
+// 1. isConnected?
+// 2. Dynamic device list.
+// 3. Connect try catch.
+// 4. Get Pose.
+// 5. is_adapter_running
+// 6. is_dobot_connecting
+// 7. disconnect.
+// 8. 分布式Adapter.

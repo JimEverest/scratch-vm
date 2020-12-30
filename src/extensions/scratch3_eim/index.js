@@ -428,11 +428,8 @@ class EIMBlocks {
                     blockType: BlockType.COMMAND,
                     text: Form_control_node[the_locale],
                     arguments: {
-                        turn: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "start",
-                            menu: "turn",
-                        },
+                        
+                        
                         node_name: {
                             type: ArgumentType.STRING,
                             defaultValue: "node_physical_blocks",
