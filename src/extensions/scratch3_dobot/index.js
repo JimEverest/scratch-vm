@@ -121,7 +121,24 @@ class DobotClient{
         content.onoff = onoff;
         return this.emit_with_messageid(NODE_ID,content)       
     }
-
+    clear(){
+        const content = {}
+        content.command = "clear";
+        return this.emit_with_messageid(NODE_ID,content)
+        
+    }
+    home(){
+        const content = {}
+        content.command = "home";
+        return this.emit_with_messageid(NODE_ID,content)
+        
+    }
+    close(){
+        const content = {}
+        content.command = "close";
+        return this.emit_with_messageid(NODE_ID,content)
+        
+    }
 }
 
 
@@ -238,6 +255,28 @@ class DobotExtension{
                     arguments: {
                     },
                     text: "Try to auto connnect Dobot"
+                },
+
+                {
+                    opcode: "close",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: "Disconnect Dobot"
+                },
+                {
+                    opcode: "home",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: "Home Dobot"
+                },
+                {
+                    opcode: "clear",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: "Clear Alarm Dobot"
                 }
 
 
@@ -297,6 +336,16 @@ class DobotExtension{
         const onoff = args.onoff;
         return  this.dobot_client.suction(onoff);
     }
+    clear(args){
+        return  this.dobot_client.clear();
+    }
+    home(args){
+        return  this.dobot_client.home();
+    }
+    close(args){
+        return  this.dobot_client.close();
+    }
+
 }
 
 module.exports = DobotExtension;
