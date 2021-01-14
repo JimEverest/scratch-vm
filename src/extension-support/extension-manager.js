@@ -28,6 +28,7 @@ const builtinExtensions = {
     hfweather: () => require('../extensions/scratch3_hfweather'),
     dobot: () => require('../extensions/scratch3_dobot'), 
     eim: () => require('../extensions/scratch3_eim'), 
+    baidu:() => require('../extensions/scratch3_baidu'), 
 };
 
 /**
