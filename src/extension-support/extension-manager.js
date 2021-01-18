@@ -29,6 +29,7 @@ const builtinExtensions = {
     dobot: () => require('../extensions/scratch3_dobot'), 
     eim: () => require('../extensions/scratch3_eim'), 
     baidu:() => require('../extensions/scratch3_baidu'), 
+    micro:() => require('../extensions/scratch3_micro'), 
 };
 
 /**
