@@ -6,8 +6,6 @@ class bleConnection
 
     constructor( runtime) {
         this._runtime = runtime;
-
-        debugger
         this.UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 
         // Allows the micro:bit to transmit a byte array
@@ -20,14 +18,11 @@ class bleConnection
         this.rxCharacteristic;
         this.txCharacteristic;
     }
-
-
     //asyn
     microBitWriteString(string){
         if (!this.rxCharacteristic) {
             return;
         }
-
         try {
             let encoder = new TextEncoder();
             this.rxCharacteristic.writeValue(encoder.encode(string));
@@ -35,7 +30,6 @@ class bleConnection
             console.log(error);
         }
     }
-
     //async 
     microBitConnect() {
         options={
@@ -62,18 +56,31 @@ class bleConnection
         .then(service => {
             console.log('Getting Characteristics...:');
             console.log(this.UART_TX_CHARACTERISTIC_UUID);
-            this.txCharacteristic = service.getCharacteristic(
-                this.UART_TX_CHARACTERISTIC_UUID
-            );
-            //return tx
+            return Promise.all([
+                service.getCharacteristic(this.UART_TX_CHARACTERISTIC_UUID), 
+                service.getCharacteristic(this.UART_RX_CHARACTERISTIC_UUID)
+            ]);
+
+
+            // this.txCharacteristic = service.getCharacteristic(
+            //     this.UART_TX_CHARACTERISTIC_UUID
+            // );
+            // //return tx
+            // this.txCharacteristic.startNotifications();
+            // this.txCharacteristic.addEventListener(
+            // "characteristicvaluechanged",
+            // this.onTxCharacteristicValueChanged
+            // );
+            // this.rxCharacteristic = service.getCharacteristic(
+            //     this.UART_RX_CHARACTERISTIC_UUID
+            // );
+        })
+        .then(args => {
+            debugger
+            this.txCharacteristic = args[0];
+            this.rxCharacteristic = args[1];
             this.txCharacteristic.startNotifications();
-            this.txCharacteristic.addEventListener(
-            "characteristicvaluechanged",
-            this.onTxCharacteristicValueChanged
-            );
-            this.rxCharacteristic = service.getCharacteristic(
-                this.UART_RX_CHARACTERISTIC_UUID
-            );
+            this.txCharacteristic.addEventListener("characteristicvaluechanged",this.onTxCharacteristicValueChanged);
         })
         .catch(error => {
           console.log('Argh! ' + error);

@@ -42,9 +42,15 @@ class MicroExtension{
                     blockType: BlockType.COMMAND, 
                     arguments: {
                     },
-                    text: "CConnect Micro:bit"
-                }
-
+                    text: "Connect Micro:bit"
+                },
+                {   // display heart on LED.
+                    opcode: "test",                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: "Test Micro:bit"
+                },
 
             ]
         };
@@ -56,6 +62,10 @@ class MicroExtension{
         //const _port = args.port;
         //return this.dobot_client.connect_dobot(NODE_ID,_port); //await.
         this.ble.microBitConnect();
+    }
+
+    test(args){
+        this.ble.microBitWriteString("x1\n")
     }
 
 }
