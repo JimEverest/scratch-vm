@@ -1,9 +1,6 @@
 
 class bleConnection
 {
-
-    
-
     constructor( runtime) {
         this._runtime = runtime;
         this.UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
@@ -60,27 +57,12 @@ class bleConnection
                 service.getCharacteristic(this.UART_TX_CHARACTERISTIC_UUID), 
                 service.getCharacteristic(this.UART_RX_CHARACTERISTIC_UUID)
             ]);
-
-
-            // this.txCharacteristic = service.getCharacteristic(
-            //     this.UART_TX_CHARACTERISTIC_UUID
-            // );
-            // //return tx
-            // this.txCharacteristic.startNotifications();
-            // this.txCharacteristic.addEventListener(
-            // "characteristicvaluechanged",
-            // this.onTxCharacteristicValueChanged
-            // );
-            // this.rxCharacteristic = service.getCharacteristic(
-            //     this.UART_RX_CHARACTERISTIC_UUID
-            // );
         })
         .then(args => {
-            debugger
             this.txCharacteristic = args[0];
             this.rxCharacteristic = args[1];
             this.txCharacteristic.startNotifications();
-            this.txCharacteristic.addEventListener("characteristicvaluechanged",this.onTxCharacteristicValueChanged);
+            this.txCharacteristic.addEventListener("characteristicvaluechanged",this.onTxCharacteristicValueChanged.bind(this));
         })
         .catch(error => {
           console.log('Argh! ' + error);
@@ -109,8 +91,12 @@ class bleConnection
             receivedData[i] = event.target.value.getUint8(i);
         }
         const receivedString = String.fromCharCode.apply(null, receivedData);
-        if (typeof microBitReceivedMessage !== 'undefined'){
-            this.ßmicroBitReceivedMessage(receivedString);
+        
+        console.log(this.microBitReceivedMessage)
+        debugger
+
+        if (typeof this.microBitReceivedMessage !== 'undefined'){
+            this.microBitReceivedMessage(receivedString);
         }else{
             console.log("microBitReceivedMessage is not defined")
         }

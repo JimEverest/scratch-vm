@@ -65,7 +65,14 @@ class MicroExtension{
     }
 
     test(args){
-        this.ble.microBitWriteString("x1\n")
+        let heart_cmd = {
+            cmd_id:"9980",
+            cmd:"heart",
+            cmd_payload:"hello heart!",
+        }
+        cmd_str = JSON.stringify(heart_cmd) + "\n"
+        debugger
+        this.ble.microBitWriteString(cmd_str)
     }
 
 }
