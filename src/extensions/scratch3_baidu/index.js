@@ -310,7 +310,7 @@ class BaiduAI {
         "len": dataLength,
         "speech": base64
       }
-      fetch("https://vop.baidu.com/server_api", {
+      fetch("https://cors-anywhere.herokuapp.com/https://vop.baidu.com/server_api", {
         body: JSON.stringify(reqJson),
         headers: {
           'content-type': 'application/json'
@@ -470,3 +470,17 @@ module.exports = BaiduAI;
 //todo:
 //1. auto get access token.
 //2. CORS:  https://github.com/Baidu-AIP/speech-tts-cors
+//         
+//         WTH?
+//         https://ai.baidu.com/ai-doc/SPEECH/jkhq0ohzz
+//         "浏览器由于无法跨域请求百度语音服务器的域名，因此无法直接使用本接口。需从服务器端发起调用。"
+//3. CORS-Proxy:
+//         https://stackoverflow.com/questions/43871637/no-access-control-allow-origin-header-is-present-on-the-requested-resource-whe
+//         https://github.com/Rob--W/cors-anywhere/
+//3. CORS Extension(Chrome:)
+//         https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en
+//         https://mybrowseraddon.com/access-control-allow-origin.html
+
+//notes:
+//1. Doc: https://ai.baidu.com/ai-doc/SPEECH/Vk38lxily
+//2. Git: https://github.com/Baidu-AIP/speech-demo
