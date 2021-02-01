@@ -2,7 +2,7 @@
  * Created by Jim on 2020/12/25.
  */
 const RegeneratorRuntime = require('regenerator-runtime/runtime');
-
+const cast = require('../../util/cast');
 const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const formatMessage = require('format-message');
@@ -15,7 +15,7 @@ const blockIconURI =
 const menuIconURI = blockIconURI;
 const NODE_ID = 'micro';
 
-class MicroExtension{                                                                                                                  
+class micro{                                                                                                                  
     constructor(runtime) {
         /**
          * The runtime instantiating this block package.
@@ -23,16 +23,31 @@ class MicroExtension{
          */
         this.runtime = runtime;
         this.ble = new ble(runtime);
+        this.ble.microBitReceivedMessage = this.microBitReceivedMessage.bind(this);
+
+        this.hat_num = 0;
     }
 
     static get STATE_KEY() {
         return 'Scratch.micro';
     }
 
+    microBitReceivedMessage(msg){
+        console.log("Server: ", msg);
+        var srv_cmd = msg.split(",")[0];
+        switch(srv_cmd) {
+            case "so":
+                this.runtime.startHats('micro_onSonar', {});
+                break;
+            default:
+                1+1;
+          }
+    }
+
     getInfo() {
         return {
             id: NODE_ID,
-            name: 'Micro',
+            name: 'micro',
             menuIconURI: menuIconURI,
             blockIconURI: blockIconURI,
             blocks: [
@@ -56,9 +71,49 @@ class MicroExtension{
                     blockType: BlockType.COMMAND, 
                     arguments: {
                     },
-                    text: 'Test Micro:bit LED'
+                    text: 'Test OFF LED'
                 },
-
+                {
+                    opcode: 'displaySymbol',
+                    text: formatMessage({
+                        id: 'microbit.displaySymbol',
+                        default: 'display [MATRIX]',
+                        description: 'display a pattern on the micro:bit display'
+                    }),
+                    blockType: BlockType.COMMAND,
+                    arguments: {
+                        MATRIX: {
+                            type: ArgumentType.MATRIX,
+                            defaultValue: '0101010101100010101000100'
+                        }
+                    }
+                },
+                {
+                    opcode: "getSonar",                // Todo
+                    blockType: BlockType.REPORTER, 
+                    arguments: {
+                    },
+                    text: "Get Sonar"
+                },
+                {
+                    opcode: 'onSonar',
+                    blockType: BlockType.HAT,
+                    isEdgeActivated: false,
+                    text: '当Sonar返回'
+                },
+                {
+                    opcode: 'onHat',
+                    blockType: BlockType.HAT,
+                    isEdgeActivated: false,
+                    text: 'Hat test'
+                },
+                {   // display heart on LED.
+                    opcode: 'trigHat',                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: 'Trig-Hat'
+                }
             ]
         };
     }
@@ -70,6 +125,22 @@ class MicroExtension{
         //return this.dobot_client.connect_dobot(NODE_ID,_port); //await.
         this.ble.microBitConnect();
     }
+    onSonar(args,util)
+    {
+        return true;
+    }
+
+    //test
+    onHat(args,util)
+    {
+        this.hat_num +=1;
+        console.log("on hat cnt: " , this.hat_num)
+        return true;
+    }
+    trigHat(args){
+        this.runtime.startHats('micro_onHat', {});
+    }
+
 
     test(args){
 
@@ -93,6 +164,13 @@ class MicroExtension{
         //debugger 
         this.ble.microBitWriteString(cmd_str)
     }
+
+    getSonar(args){
+        cmd_str = "so,,;"
+        //debugger 
+        this.ble.microBitWriteString(cmd_str)
+
+    }
     testLED(){
         var ledMatrix = [
             ['0', '0', '0', '0', '0'],
@@ -104,9 +182,25 @@ class MicroExtension{
           
         this.ble.writeMatrixIcon(ledMatrix);
     }
+
+
+    displaySymbol (args) {
+        const symbol = cast.toString(args.MATRIX).replace(/\s/g, '');
+        // "0101010101100010101000100"
+        const arr = symbol.split("");
+        // (25) ["0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "1", "0", "0", "0", "1", "0", "1", "0", "1", "0", "0", "0", "1", "0", "0"]
+
+        newArr = [];
+        while(arr.length)
+            newArr.push(arr.splice(0,5));
+
+        this.ble.writeMatrixIcon(newArr);
+    }
+
+
 }
 
-module.exports = MicroExtension;
+module.exports = micro;
 
 
 
