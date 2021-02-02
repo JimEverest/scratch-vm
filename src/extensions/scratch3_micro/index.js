@@ -71,7 +71,26 @@ class micro{
                     blockType: BlockType.COMMAND, 
                     arguments: {
                     },
-                    text: 'Test OFF LED'
+                    text: 'OFF LED'
+                },
+                {   // display heart on LED.
+                    opcode: 'move_single_motor',                // Todo: return list-string splited by comma.
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                        Target: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "1A",
+                        },
+                        Speed: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 150,
+                        },
+                        Delay:{
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 2,
+                        }
+                    },
+                    text: 'move motor'
                 },
                 {
                     opcode: 'displaySymbol',
@@ -107,8 +126,8 @@ class micro{
                     isEdgeActivated: false,
                     text: 'Hat test'
                 },
-                {   // display heart on LED.
-                    opcode: 'trigHat',                // Todo: return list-string splited by comma.
+                { 
+                    opcode: 'trigHat', 
                     blockType: BlockType.COMMAND, 
                     arguments: {
                     },
@@ -179,8 +198,14 @@ class micro{
             ['0', '0', '0', '0', '0'],
             ['0', '0', '0', '0', '0']
           ]
-          
         this.ble.writeMatrixIcon(ledMatrix);
+    }
+    move_single_motor(args) {
+        const target = args.Target;
+        const speed = args.Speed;
+        const delay = args.Delay;
+        cmd_str = "mm,"+target+","+speed+","+delay+";"
+        this.ble.microBitWriteString(cmd_str)
     }
 
 
