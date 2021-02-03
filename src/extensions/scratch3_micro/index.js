@@ -53,7 +53,7 @@ class micro{
             blocks: [
                 
                 {
-                    opcode: 'connect',                // Todo: return list-string splited by comma.
+                    opcode: 'connect',            
                     blockType: BlockType.COMMAND, 
                     arguments: {
                     },
@@ -73,8 +73,8 @@ class micro{
                     },
                     text: 'OFF LED'
                 },
-                {   // display heart on LED.
-                    opcode: 'move_single_motor',                // Todo: return list-string splited by comma.
+                {  
+                    opcode: 'move_single_motor',             
                     blockType: BlockType.COMMAND, 
                     arguments: {
                         Target: {
@@ -90,8 +90,58 @@ class micro{
                             defaultValue: 2,
                         }
                     },
-                    text: 'move motor'
+                    text: 'move motor [Target] speed:[Speed] delay:[Delay]'
                 },
+                
+                { 
+                    opcode: 'move_double_motor',        
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                        Target1: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "1A",
+                        },
+                        Speed1: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 150,
+                        },
+                        Target2: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "2B",
+                        },
+                        Speed2: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 150,
+                        }
+                    },
+                    text: 'move motor [Target1] speed:[Speed1] & [Target2] speed:[Speed2]'
+                },
+                { 
+                    opcode: 'stop_motors',              
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                    },
+                    text: 'Stop DC motors'
+                },  
+                
+
+                {  
+                    opcode: 'move_servo',             
+                    blockType: BlockType.COMMAND, 
+                    arguments: {
+                        Target: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "1",
+                        },
+                        Angle: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0,
+                        }
+                    },
+                    text: 'move servo [Target] angle:[Angle]'
+                },
+
+
                 {
                     opcode: 'displaySymbol',
                     text: formatMessage({
@@ -204,7 +254,30 @@ class micro{
         const target = args.Target;
         const speed = args.Speed;
         const delay = args.Delay;
-        cmd_str = "mm,"+target+","+speed+","+delay+";"
+        cmd_str = "m,"+target+","+speed+","+delay+";";
+        debugger
+        this.ble.microBitWriteString(cmd_str)
+    }
+
+    move_double_motor(args) {
+        const target1 = args.Target1;
+        const speed1 = args.Speed1;
+        const target2 = args.Target2;
+        const speed2 = args.Speed2;
+        cmd_str = "mm,"+target1+","+target2+","+speed1+","+speed2+";";
+        this.ble.microBitWriteString(cmd_str)
+    }
+
+    //new
+    stop_motors(args) {
+        cmd_str = "st;";
+        this.ble.microBitWriteString(cmd_str)
+    }
+
+    move_servo(args) {
+        const target = args.Target;
+        const angle = args.Angle;
+        cmd_str = "sv,"+target+","+angle+";";
         this.ble.microBitWriteString(cmd_str)
     }
 
