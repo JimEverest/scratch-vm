@@ -23,26 +23,16 @@ class micro{
          */
         this.runtime = runtime;
         this.ble = new ble(runtime);
-        this.ble.microBitReceivedMessage = this.microBitReceivedMessage.bind(this);
-
-        this.hat_num = 0;
+        this.ble.listenMicrobit = this.listenMicrobit.bind(this);
+        this._promiseResolves = {};
+        this.hat_num = 0; 
     }
 
     static get STATE_KEY() {
         return 'Scratch.micro';
     }
 
-    microBitReceivedMessage(msg){
-        console.log("Server: ", msg);
-        var srv_cmd = msg.split(",")[0];
-        switch(srv_cmd) {
-            case "so":
-                this.runtime.startHats('micro_onSonar', {});
-                break;
-            default:
-                1+1;
-          }
-    }
+
 
     getInfo() {
         return {
@@ -216,8 +206,6 @@ class micro{
         function getRandomInt(max) {
             return Math.floor(Math.random() * Math.floor(max));
           }
-
-
         let led_cmd = {
             cmd_id:'9980',
             cmd:'led',
@@ -231,14 +219,15 @@ class micro{
         //cmd_str = "1234567890"+"1234" + getRandomInt(10) + ";"
         cmd_str = "aaa,bbb,aa;"
         //debugger 
-        this.ble.microBitWriteString(cmd_str)
+        this.ble.microBitWriteString(cmd_str);
     }
 
     getSonar(args){
-        cmd_str = "so,,;"
+        msg_id = sUID();
+        cmd_str = "so,"+msg_id+";";
         //debugger 
-        this.ble.microBitWriteString(cmd_str)
-
+        this.ble.microBitWriteString(cmd_str);
+        return this.ble.getReplyMsg(msg_id,3000);
     }
     testLED(){
         var ledMatrix = [
@@ -300,8 +289,16 @@ class micro{
 
 module.exports = micro;
 
-
-
+// Utils
+function sUID() {
+    // I generate the UID from two parts here 
+    // to ensure the random number provide enough bits.
+    var firstPart = (Math.random() * 46656) | 0;
+    var secondPart = (Math.random() * 46656) | 0;
+    firstPart = ("000" + firstPart.toString(36)).slice(-3);
+    secondPart = ("000" + secondPart.toString(36)).slice(-3);
+    return firstPart + secondPart;
+}
 // todo
 // 1. isConnected?
 // 2. Dynamic device list.

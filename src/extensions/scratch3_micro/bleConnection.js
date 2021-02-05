@@ -45,7 +45,7 @@ class bleConnection
         this.uBitDevice;
         this.rxCharacteristic;
         this.txCharacteristic;
-
+        this._promiseResolves ={};
 
         this.accelerometer = {
             x: 0,
@@ -98,6 +98,21 @@ class bleConnection
             console.log(error);
         }
     }
+
+    getReplyMsg(msgID, timeout=5000){
+      return new Promise(function(resolve, reject){
+        this._promiseResolves[msgID] = resolve;
+        setTimeout(function(){
+          if(this._promiseResolves[msgID]){
+            console.error(msgID + `: timeout (${timeout/1000}s)`)
+            this.runtime.emit('PUSH_NOTIFICATION', {content: `timeout(${timeout/1000}s)`, type: 'error'})
+            resolve(`timeout(${timeout/1000}s)`);
+          }
+        },timeout)
+      })
+    }
+
+
     //async 
     microBitConnect() {
         options={
@@ -288,22 +303,40 @@ class bleConnection
             receivedData[i] = event.target.value.getUint8(i);
         }
         const receivedString = String.fromCharCode.apply(null, receivedData);
-        if (typeof this.microBitReceivedMessage !== 'undefined'){
-            this.microBitReceivedMessage(receivedString);
+        if (typeof this.listenMicrobit !== 'undefined'){
+            this.listenMicrobit(receivedString);
         }else{
-            console.log("microBitReceivedMessage is not defined")
+            console.log("listenMicrobit is not defined")
         }
         //console.log(receivedString);
     }
 
 
-
-    //Todo
     //Handle Message from BLE-UART-Cha
-    microBitReceivedMessage(msg)
-    {
-        console.log("from mmicrobit uart: " + msg);
-    }
+    listenMicrobit(msg){
+      
+      var message_id = msg.split(",")[0];
+      //var srv_cmd = msg.split(",")[1];
+      var message_content = msg.split(",")[2];
+
+      if (typeof message_id !== "undefined") {
+          if (this._promiseResolves[message_id]){
+              this._promiseResolves[message_id](message_content);
+              delete this._promiseResolves[message_id];
+              //console.log({message_id:this._promiseResolves[message_id]});
+          }
+      }
+      else{
+        console.log("Microbit msg w/o id: ", msg);
+      }
+      // switch(srv_cmd) {
+      //     case "so":
+      //         //this.runtime.startHats('micro_onSonar', {});
+      //         break;
+      //     default:
+      //         break;
+      //   }
+  }
         
     microBitDisconnect() {
         if (!uBitDevice) {
