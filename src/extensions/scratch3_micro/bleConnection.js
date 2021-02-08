@@ -47,6 +47,9 @@ class bleConnection
         this.txCharacteristic;
         this._promiseResolves ={};
 
+        this.t0 = 0;
+        this.t1 = 0;
+
         this.accelerometer = {
             x: 0,
             y: 0,
@@ -100,9 +103,13 @@ class bleConnection
     }
 
     getReplyMsg(msgID, timeout=5000){
-      return new Promise(function(resolve, reject){
+      return new Promise((resolve, reject) => {
+        // console.log(this._promiseResolves)
         this._promiseResolves[msgID] = resolve;
-        setTimeout(function(){
+        // this._promiseResolves["test"] = "hahaha";
+        setTimeout(()=>{
+          // debugger
+          // console.log(this._promiseResolves)
           if(this._promiseResolves[msgID]){
             console.error(msgID + `: timeout (${timeout/1000}s)`)
             this.runtime.emit('PUSH_NOTIFICATION', {content: `timeout(${timeout/1000}s)`, type: 'error'})
@@ -314,15 +321,18 @@ class bleConnection
 
     //Handle Message from BLE-UART-Cha
     listenMicrobit(msg){
-      
       var message_id = msg.split(",")[0];
       //var srv_cmd = msg.split(",")[1];
       var message_content = msg.split(",")[2];
 
       if (typeof message_id !== "undefined") {
+        //console.log(this._promiseResolves)
           if (this._promiseResolves[message_id]){
               this._promiseResolves[message_id](message_content);
               delete this._promiseResolves[message_id];
+              //for test
+              this.t1=performance.now();
+              console.log("Call to doSomething took " + (this.t1 - this.t0) + " milliseconds.")
               //console.log({message_id:this._promiseResolves[message_id]});
           }
       }
