@@ -23,8 +23,8 @@ class micro{
          */
         this.runtime = runtime;
         this.ble = new ble(runtime);
-        this.ble.listenMicrobit = this.listenMicrobit.bind(this);
-        this._promiseResolves = {};
+        //this.ble.listenMicrobit = this.listenMicrobit.bind(this);
+        
         this.hat_num = 0; 
     }
 
@@ -224,9 +224,11 @@ class micro{
 
     getSonar(args){
         msg_id = sUID();
-        cmd_str = "so,"+msg_id+";";
+        cmd_str = "so,"+msg_id+",2,1;";
         //debugger 
         this.ble.microBitWriteString(cmd_str);
+        //for test
+        this.ble.t0=performance.now();
         return this.ble.getReplyMsg(msg_id,3000);
     }
     testLED(){
@@ -244,7 +246,7 @@ class micro{
         const speed = args.Speed;
         const delay = args.Delay;
         cmd_str = "m,"+target+","+speed+","+delay+";";
-        debugger
+        //debugger
         this.ble.microBitWriteString(cmd_str)
     }
 
