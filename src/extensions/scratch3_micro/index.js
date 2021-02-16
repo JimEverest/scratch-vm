@@ -155,6 +155,17 @@ class micro{
                     text: "Get Sonar"
                 },
                 {
+                    opcode: "getServoAngle",                // Todo
+                    blockType: BlockType.REPORTER, 
+                    arguments: {
+                        ServoID: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1,
+                        }
+                    },
+                    text: "Get Servo [ServoID] Angle"
+                },
+                {
                     opcode: 'onSonar',
                     blockType: BlockType.HAT,
                     isEdgeActivated: false,
@@ -220,6 +231,18 @@ class micro{
         cmd_str = "aaa,bbb,aa;"
         //debugger 
         this.ble.microBitWriteString(cmd_str);
+    }
+
+    getServoAngle(args){
+        debugger
+        msg_id = sUID();
+        s_id = args.ServoID;
+        cmd_str = "sva,"+msg_id+","+s_id+";";
+        debugger 
+        this.ble.microBitWriteString(cmd_str);
+        //for test
+        this.ble.t0=performance.now();
+        return this.ble.getReplyMsg(msg_id,3000);
     }
 
     getSonar(args){

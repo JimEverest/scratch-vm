@@ -30,6 +30,7 @@ const builtinExtensions = {
     eim: () => require('../extensions/scratch3_eim'), 
     baidu:() => require('../extensions/scratch3_baidu'), 
     micro:() => require('../extensions/scratch3_micro'), 
+    aim:() => require('../extensions/scratch3_autoAIM')
 };
 
 /**

@@ -15,54 +15,67 @@ const menuIconURI = blockIconURI;
 
 
 
-const NODE_ID = "autoAIM";
+const NODE_ID = "aim";
 const HELP_URL = "https://www.wildkids.fun";
 
 
 class autoAIM {
+
+    // Listen fn to get msgs from Adapter.
+    // Only ADAPTER_TOPIC type topic ("adapter/nodes/data") will triger follow handler.
     onAdapterPluginMessage(msg) {
         this.adapter_node_content_hat = msg.message.payload.content; // todo topic
         this.adapter_node_content_reporter = msg.message.payload.content;
         this.node_id = msg.message.payload.node_id;
     }
+    
+    
+    // Handle base64-img and offsets here. 
+    // Check both Topic and Timestamp.
+    onMessage(msg) {
+        //debugger
+        console.log("====================================================================")
+        console.log("TOPIC-----> ", msg.message.payload.topic);
+        //console.log("PAYLOAD----->", msg.message.payload);
+        console.log("Time----->  ", msg.message.payload.timestamp);
+
+
+        if (msg.message.payload.topic == "aim_offsets"){
+            var offsets = msg.message.payload.content.split(",");
+            this.x_offset = offsets[0];
+            this.y_offset = offsets[1];
+            this.offsets_ts = msg.message.payload.timestamp;
+        }
+        else if (msg.message.payload.topic == "aim_label_img"){
+            this.label_img = msg.message.payload.content
+            this.label_img_ts = msg.message.payload.timestamp;
+        }
+
+    }
+
 
     constructor (runtime) {
-
         this.runtime = runtime;
-
-
         this.exts_statu = {};
         this.nodes_statu = {};
         this.emit_timeout = 5000; //ms
         this.adapter_base_client = new AdapterBaseClient(
             null, // onConnect,
             null, // onDisconnect,
-            null, // onMessage,
+            this.onMessage.bind(this), // onMessage,   // ******* ALL MESSAGE *******
             this.onAdapterPluginMessage.bind(this), // onAdapterPluginMessage,
-            null,
-            null,
-            //this.update_nodes_status.bind(this), // update_nodes_status,
-            //this.node_statu_change_callback.bind(this), // node_statu_change_callback,
-            null, // notify_callback,
+            null, // update_nodes_status              this.update_nodes_status.bind(this),
+            null, // node_statu_change_callback       this.node_statu_change_callback.bind(this) 
+            null, // notify_callback,          NOTIFICATION_TOPIC {core/notification}
             null, // error_message_callback,
             null, // update_adapter_status
             100 ,//SendRateMax // EIM没有可以发送100条消息
             runtime,
         );
-
-
-
     }
-
-
-
     static get STATE_KEY () {
         return 'Scratch.autoAIM';
     }
-
-    /**
-     * @returns {object} metadata for this extension and its blocks.
-     */
     getInfo () {
         return {
             id: 'autoAIM',
@@ -75,6 +88,72 @@ class autoAIM {
             blockIconURI: blockIconURI,
             // showStatusButton: true,
             blocks: [
+                {
+                    opcode: 'getStream',
+                    blockType: BlockType.COMMAND,
+                    text: 'Get Stream [url]',
+                    arguments: {
+                        url: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "video url",
+                        },
+                    }
+                },
+                {
+                    opcode: 'shutStream',
+                    blockType: BlockType.COMMAND,
+                    text: 'Shut down Stream'
+                },
+
+                {
+                    opcode: 'openDet',
+                    blockType: BlockType.COMMAND,
+                    text: 'Switch Detect [det_fn]',
+                    arguments: {
+                        det_fn: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "None",
+                            menu: "det_fn"
+                        }
+                    }
+                },
+                {
+                    opcode: 'closeDet',
+                    blockType: BlockType.COMMAND,
+                    text: 'Switch Detect [det_fn]',
+                    arguments: {
+                        det_fn: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "None",
+                            menu: "det_fn"
+                        }
+                    }
+                },
+
+                {
+                    opcode: 'getLabelImg',
+                    blockType: BlockType.REPORTER,
+                    text: 'get Label Img',
+                    arguments: {
+                    }
+                },
+
+
+                {
+                    opcode: 'Canvas_cover_Origin',
+                    blockType: BlockType.COMMAND,
+                    text: 'Show [src] on Canvas ',
+                    arguments: {
+                        src: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "",
+                        }
+                    }
+                },
+
+                
+
+
                 {
                     opcode: 'getStageImg',
                     blockType: BlockType.REPORTER,
@@ -96,7 +175,7 @@ class autoAIM {
                 {
                     opcode: 'showImg_NewCanvas',
                     blockType: BlockType.COMMAND,
-                    text: 'Show Img in New Canvas',
+                    text: 'Show [new_str_b64] in New Canvas',
                     arguments: {
                         new_str_b64: {
                             type: ArgumentType.STRING,
@@ -106,9 +185,45 @@ class autoAIM {
                 }
 
             ],
-            menus: {}
+            menus: {
+                det_fn: {
+                    acceptReporters: true,
+                    items: ["None","Aruco", "Ball", "Face", "Number"],
+                }
+            },
         };
     }
+
+
+    getStream(args) {
+        const url = args.url;
+        const content = {};
+        content.url = url;
+        content.command = "getStream";
+        return this.adapter_base_client.emit_with_messageid(NODE_ID,content)
+    }
+
+    shutStream(args) {
+        const content = {};
+        content.command = "shutStream";
+        return this.adapter_base_client.emit_with_messageid(NODE_ID,content)
+    }
+
+    openDet(args) {
+        const content = {};
+        content.command = "openDet";
+        content.detFN = args.det_fn;
+        return this.adapter_base_client.emit_with_messageid(NODE_ID,content)
+    }
+
+    closeDet(args) {
+        const content = {};
+        content.command = "closeDet";
+        return this.adapter_base_client.emit_with_messageid(NODE_ID,content)
+    }
+
+
+
 
     getStageImg (args, util) {
         // Get base64 image from stage canvas.
@@ -119,8 +234,7 @@ class autoAIM {
         //this.runtime.emit('SAY', util.target, 'say', message);
     }
 
-    
-
+  
     sendImg2Adapter(args, util) {
         const img = args.img_str_b64;
         console.log(message);
@@ -128,18 +242,48 @@ class autoAIM {
         content.img64 = img;
         content.command = "aim";
         return this.adapter_base_client.emit_with_messageid(NODE_ID, content, this.emit_timeout)
-
-
     }
 
+    getLabelImg(args){
+        return this.label_img;
+    }
 
+    Canvas_cover_Origin(args){
+        debugger
+        var img  = new Image();
+        img.src = args.src;
+        var canv = document.getElementById('canvas_Lbl_Img');
+        if (canv == null){
+            const originCanvas = this.runtime.renderer._gl.canvas;
+            canv = document.createElement('canvas');
+            canv.id = 'canvas_Lbl_Img';
+            canv.width = 480
+            canv.height = 360
+            // 将绘制的canvas覆盖于原canvas之上
+            originCanvas.parentElement.style.position = 'relative'
+            canv.style.position = 'absolute'
+            canv.style.top = '0'
+            canv.style.left = '0'
+            originCanvas.parentElement.append(canv)
+        }
+        var ctx = canv.getContext("2d");
+        
+        img.onload = function() {
+
+            createImageBitmap( img, { resizeWidth: 480, resizeHeight: 360, resizeQuality: 'high' })
+            .then(imageBitmap => ctx.drawImage(imageBitmap, 0, 0));
+
+
+            // ctx.drawImage(img, 0, 0);
+        };
+
+    }
 
     showImg_NewCanvas(args, util){
         var img  = new Image();
         //#region img src (base64)
         img.src = args.new_str_b64;
         //#endregion
-
         var canv = document.getElementById('canvasFPV');
         if (canv == null){
             //Inject Draggable Div
@@ -172,7 +316,6 @@ class autoAIM {
             `);
             this.dragElement(document.getElementById("fpvdiv"));
 
-            
             canv = document.createElement('canvas');
             canv.id = 'canvasFPV';
             canv.height = 400;
@@ -180,14 +323,18 @@ class autoAIM {
             //document.body.appendChild(canv);
             document.getElementById('fpvBox').appendChild(canv); 
         }
-        
-        
+
         var ctx = canv.getContext("2d");
 
         img.onload = function() {
             ctx.drawImage(img, 0, 0);
         };
-        
+    }
+
+
+    read_stream_trans_2_new_stream(){
+        // read from raw stream
+        // trans to scratch 
     }
 
 
@@ -241,9 +388,6 @@ class autoAIM {
           document.onmousemove = null;
         }
     }
-
-
-    
 }
 
 module.exports = autoAIM;

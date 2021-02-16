@@ -182,10 +182,11 @@ class AdapterBaseClient {
                         onAdapterPluginMessage(msg);
                     }
                     // window.message = msg; // to global
-                    console.log(
-                        `ADAPTER_TOPIC message->`,
-                        content
-                    );
+                    //todo uncomment?
+                    // console.log(
+                    //     `ADAPTER_TOPIC message->`,
+                    //     content
+                    // );
                     // 处理对应id的resolve
                     if (typeof message_id !== "undefined") {
                         if (this._promiseResolves[message_id]){
