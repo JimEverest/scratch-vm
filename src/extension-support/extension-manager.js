@@ -24,13 +24,15 @@ const builtinExtensions = {
     makeymakey: () => require('../extensions/scratch3_makeymakey'),
     boost: () => require('../extensions/scratch3_boost'),
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
+    
     helloWorld: () => require('../extensions/scratch3_hello_world'),
     hfweather: () => require('../extensions/scratch3_hfweather'),
     dobot: () => require('../extensions/scratch3_dobot'), 
     eim: () => require('../extensions/scratch3_eim'), 
     baidu:() => require('../extensions/scratch3_baidu'), 
     micro:() => require('../extensions/scratch3_micro'), 
-    aim:() => require('../extensions/scratch3_autoAIM')
+    aim:() => require('../extensions/scratch3_autoAIM'),
+    otto: () => require('../extensions/scratch3_otto')
 };
 
 /**

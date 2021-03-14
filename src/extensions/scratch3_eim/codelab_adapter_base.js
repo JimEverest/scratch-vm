@@ -86,7 +86,7 @@ class AdapterBaseClient {
         // on message
         this.socket.on("sensor", (msg) => {
             // actuator: to scratch
-            console.log("recv(all message):", msg.message);
+            // console.log("recv(all message):", msg.message);
             if (typeof onMessage === "function") {
                 onMessage(msg);
             }

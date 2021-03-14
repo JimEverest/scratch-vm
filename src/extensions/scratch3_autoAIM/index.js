@@ -34,13 +34,14 @@ class autoAIM {
     // Check both Topic and Timestamp.
     onMessage(msg) {
         //debugger
-        console.log("====================================================================")
-        console.log("TOPIC-----> ", msg.message.payload.topic);
+        //console.log("==========================")
+        //console.log("TOPIC-----> ", msg.message.payload.topic);
         //console.log("PAYLOAD----->", msg.message.payload);
-        console.log("Time----->  ", msg.message.payload.timestamp);
+        //console.log("Time----->  ", msg.message.payload.timestamp);
 
 
         if (msg.message.payload.topic == "aim_offsets"){
+            console.log(msg.message.payload.content); 
             var offsets = msg.message.payload.content.split(",");
             this.x_offset = offsets[0];
             this.y_offset = offsets[1];
@@ -95,7 +96,7 @@ class autoAIM {
                     arguments: {
                         url: {
                             type: ArgumentType.STRING,
-                            defaultValue: "video url",
+                            defaultValue: "http://192.168.50.186/capture",
                         },
                     }
                 },
@@ -129,6 +130,19 @@ class autoAIM {
                         }
                     }
                 },
+                
+                {
+                    opcode: 'getOffsets',
+                    blockType: BlockType.REPORTER,
+                    text: 'get offset [axis]',
+                    arguments: {
+                        axis: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "x",
+                            menu: "offset_axis"
+                        }
+                    }
+                },
 
                 {
                     opcode: 'getLabelImg',
@@ -150,7 +164,13 @@ class autoAIM {
                         }
                     }
                 },
-
+                {
+                    opcode: 'cleanFPV',
+                    blockType: BlockType.COMMAND,
+                    text: 'Clean FPV Canvas ',
+                    arguments: {
+                    }
+                },
                 
 
 
@@ -189,6 +209,10 @@ class autoAIM {
                 det_fn: {
                     acceptReporters: true,
                     items: ["None","Aruco", "Ball", "Face", "Number"],
+                },
+                offset_axis:{
+                    acceptReporters: true,
+                    items: ["x","y"],
                 }
             },
         };
@@ -248,8 +272,23 @@ class autoAIM {
         return this.label_img;
     }
 
+    getOffsets(args){
+        var axis = args.axis;
+        if (axis == "x"){
+            return this.x_offset
+        }
+        else{
+            return this.y_offset
+        }
+    }
+    cleanFPV(args){
+        var canv = document.getElementById('canvas_Lbl_Img');
+        if (canv != null){
+            canv.remove();
+        }
+    }
+
     Canvas_cover_Origin(args){
-        debugger
         var img  = new Image();
         img.src = args.src;
         var canv = document.getElementById('canvas_Lbl_Img');
@@ -269,11 +308,10 @@ class autoAIM {
         var ctx = canv.getContext("2d");
         
         img.onload = function() {
-
+            // Resize image with javascript canvas (smoothly) 
+            // https://stackoverflow.com/questions/19262141/resize-image-with-javascript-canvas-smoothly
             createImageBitmap( img, { resizeWidth: 480, resizeHeight: 360, resizeQuality: 'high' })
             .then(imageBitmap => ctx.drawImage(imageBitmap, 0, 0));
-
-
             // ctx.drawImage(img, 0, 0);
         };
 
