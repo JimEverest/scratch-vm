@@ -46,10 +46,11 @@ class bleConnection
         this.rxCharacteristic;
         this.txCharacteristic;
         this._promiseResolves ={};
-
+        this.writting = false;
         this.t0 = 0;
         this.t1 = 0;
-
+        this.commandQueue=[];
+        
         this.accelerometer = {
             x: 0,
             y: 0,
@@ -88,18 +89,26 @@ class bleConnection
           UART_RX:{}
         }
 
+        this.cmd_executor = setInterval(function(){
+          if(this.commandQueue.length>0 && this.rxCharacteristic && !this.writting){
+            try{
+              cmd = this.commandQueue.shift()
+              let encoder = new TextEncoder();
+              this.writting=true;
+              this.rxCharacteristic.writeValue(encoder.encode(cmd)).then(foo=>{
+              this.writting=false;
+            });
+            }catch (error) {
+              console.log(error);
+          }
+            
+          }
+         }.bind(this), 100);
+
     }
     //asyn
     microBitWriteString(string){
-        if (!this.rxCharacteristic) {
-            return;
-        }
-        try {
-            let encoder = new TextEncoder();
-            this.rxCharacteristic.writeValue(encoder.encode(string));
-        } catch (error) {
-            console.log(error);
-        }
+      this.commandQueue.push(string); 
     }
 
     getReplyMsg(msgID, timeout=5000){

@@ -7,7 +7,8 @@ const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const formatMessage = require('format-message');
 const log = require('../../util/log');
-const ble = require('./bleConnection.js');
+// const ble = require('./bleConnection.js');
+const ble = require("../scratch3_micro/bleConnection.js");
 
 // eslint-disable-next-line max-len
 const blockIconURI =

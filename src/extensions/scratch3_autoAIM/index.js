@@ -152,11 +152,23 @@ class autoAIM {
                     }
                 },
 
-
                 {
-                    opcode: 'Canvas_cover_Origin',
+                    opcode: 'S',
                     blockType: BlockType.COMMAND,
                     text: 'Show [src] on Canvas ',
+                    arguments: {
+                        src: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "",
+                        }
+                    }
+                },
+
+
+                {
+                    opcode: 'ShowFPV',
+                    blockType: BlockType.COMMAND,
+                    text: 'FPV [src] ',
                     arguments: {
                         src: {
                             type: ArgumentType.STRING,
@@ -287,6 +299,39 @@ class autoAIM {
             canv.remove();
         }
     }
+
+    
+    
+    ShowFPV(args){
+        var img  = new Image();
+        img.src = args.src;
+        var canv = document.getElementById('canvas_Lbl_Img');
+        if (canv == null){
+            const originCanvas = this.runtime.renderer._gl.canvas;
+            canv = document.createElement('canvas');
+            canv.id = 'canvas_Lbl_Img';
+            canv.width = 480
+            canv.height = 360
+            // 将绘制的canvas覆盖于原canvas之上
+            originCanvas.parentElement.style.position = 'relative'
+            canv.style.position = 'absolute'
+            canv.style.top = '0'
+            canv.style.left = '0'
+            originCanvas.parentElement.append(canv)
+        }
+        var ctx = canv.getContext("2d");
+        
+        img.onload = function() {
+            // Resize image with javascript canvas (smoothly) 
+            // https://stackoverflow.com/questions/19262141/resize-image-with-javascript-canvas-smoothly
+            createImageBitmap( img, { resizeWidth: 480, resizeHeight: 360, resizeQuality: 'high' })
+            .then(imageBitmap => ctx.drawImage(imageBitmap, 0, 0));
+            // ctx.drawImage(img, 0, 0);
+        };
+
+    }
+
+
 
     Canvas_cover_Origin(args){
         var img  = new Image();
