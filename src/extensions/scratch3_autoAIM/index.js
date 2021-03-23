@@ -96,7 +96,7 @@ class autoAIM {
                     arguments: {
                         url: {
                             type: ArgumentType.STRING,
-                            defaultValue: "http://192.168.50.186/capture",
+                            defaultValue: "http://192.168.5.143/capture",
                         },
                     }
                 },
@@ -153,7 +153,7 @@ class autoAIM {
                 },
 
                 {
-                    opcode: 'S',
+                    opcode: 'showImg_NewCanvas',
                     blockType: BlockType.COMMAND,
                     text: 'Show [src] on Canvas ',
                     arguments: {
